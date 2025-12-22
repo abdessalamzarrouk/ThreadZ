@@ -1,26 +1,32 @@
 package com.threadzy.app.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.threadzy.app.models.UserEntity;
 import com.threadzy.app.services.UserEntityService;
 
-@Controller
+@RestController
+@CrossOrigin("http://localhost:5173")
 public class UserController {
     @Autowired
     private UserEntityService userService;
     @Autowired
     private AuthenticationManager authenticationManager;
     
-    @GetMapping("entry")
-    public void GetRequest(){
-        System.out.println("ENTERING / ENTRY POINT \n");
+    @GetMapping("/users")
+    public ResponseEntity<List<UserEntity>> getAllUsers() throws Exception {
+        List<UserEntity> users = userService.loadAllUserDetails();
+        return ResponseEntity.ok(users); 
     }
 
 
@@ -31,7 +37,7 @@ public class UserController {
             return ResponseEntity.ok("User " + username + " authenticated successfully \n");
         }
         catch (Exception e){
-            return ResponseEntity.badRequest().body("Error authenticating " + username + " cause by : " + e.getMessage() + "\n");
+            return ResponseEntity.badRequest().body("Error authenticating " + username + " caused by : " + e.getMessage() + "\n");
         }
         
 
