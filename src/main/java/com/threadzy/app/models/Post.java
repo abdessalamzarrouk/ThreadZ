@@ -19,8 +19,11 @@ public class Post {
     @Id
     @GeneratedValue(generator = "UUID")
     private UUID postId;
+    
+    private String title;
     private String content; // for now content will be text and later will implement videos , photos ....
     private ContentType contentType;
+    private long voteCount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = false)

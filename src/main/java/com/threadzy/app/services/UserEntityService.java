@@ -1,5 +1,6 @@
 package com.threadzy.app.services;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ public class UserEntityService implements UserDetailsService{
         this.passwordEncoder = passwordEncoder;
     }
 
+    public UserEntity findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username + " " + "Not Found !\n"));
@@ -38,7 +44,10 @@ public class UserEntityService implements UserDetailsService{
         return users;
     }
 
-    public void registerUser(String username, String password) throws Exception {
+    /*
+        FIX THIS LATER : FIX THE SIGNATURE OF THE METHOD AND ADAPT TO THE DEFINITION OF USER ENTITY IF MODIFIED
+    */
+    public void registerUser(String username, String password, String email) throws Exception {
         if(userRepository.findByUsername(username).isPresent()){
             throw new Exception("Username " + username + " already exists \n");
         }
@@ -46,9 +55,13 @@ public class UserEntityService implements UserDetailsService{
         // New User Default attributes
         UserEntity user = new UserEntity();
         user.setUsername(username);
+        user.setEmail(email);
         user.setPasswordhash(passwordEncoder.encode(password));
         user.setEnabled(true);
+        user.setLocked(false);
+        user.setCreatedAt(Instant.now());
         user.setRole(Role.USER);
+
         userRepository.save(user);
     }
 }

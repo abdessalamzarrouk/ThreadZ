@@ -1,7 +1,6 @@
 package com.threadzy.app.services;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -27,9 +26,9 @@ public class PostService {
     @Autowired
     private UserRepository userRepository;
     
-    public List<PostsResponse> getPosts(){
+    public List<PostsResponse> getPosts() {
         List<Post> posts = postRepository.findAll();
-        if(posts.isEmpty()){
+        if(posts.isEmpty()) {
             return Collections.emptyList();
         }
         return posts
@@ -38,8 +37,16 @@ public class PostService {
         .toList();
     }
 
+    public List<PostsResponse> getPostsByAuthor(UUID authorId) {
+        List<Post> posts = postRepository.findByAuthorId(authorId);
+        return posts
+            .stream()
+            .map(post -> new PostsResponse(post.getPostId(),post.getAuthor().getId(),post.getContent(),post.getContentType(),post.getCreatedAt()))
+            .toList();
+    }
+
     @Transactional
-    public Post createPost(PostsRequest post){
+    public Post createPost(PostsRequest post) {
         UUID authorId = post.authorId();
 
         UserEntity author = userRepository.findById(authorId)
